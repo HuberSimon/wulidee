@@ -1,0 +1,1 @@
+This is an android application to manage and organize Finances between partners.
