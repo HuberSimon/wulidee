@@ -1,1 +1,1 @@
-This is an android application to manage and organize Finances between partners.
+This is an android application to note some gift ideas of different persons
