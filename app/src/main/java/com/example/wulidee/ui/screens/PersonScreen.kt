@@ -1,0 +1,221 @@
+package com.example.wulidee.ui.screens
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import com.example.wulidee.data.local.Person
+import com.example.wulidee.ui.IdeaViewModel
+import com.example.wulidee.ui.PersonViewModel
+
+@Composable
+fun PersonScreen(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel, navController: NavController) {
+    val allPersons by personViewModel.allPersons.collectAsState(initial = emptyList())
+    var showDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedPerson by remember { mutableStateOf<Person?>(null) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+        ) {
+            item {
+                Text(text = "Leid de i beschenken mog", style = MaterialTheme.typography.titleLarge)
+            }
+
+            item { Spacer(modifier = Modifier.height(25.dp)) }
+
+            items(allPersons.filter { !it.mainPerson }) { person ->
+                PersonItem(
+                    person,
+                    onDeletePerson = {
+                        personViewModel.deletePerson(person)
+                    },
+                    onClick = {
+                        val personId = person.id
+                        navController.navigate("idea_screen/$personId")
+                    }
+                )
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { showDialog = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.secondary
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "Ebban hinzufügen", tint = Color.White)
+        }
+    }
+
+    if (showDialog) {
+        AddPersonDialog(
+            onDismiss = { showDialog = false },
+            onAddPerson = { name ->
+                personViewModel.addPerson(Person(name = name, mainPerson = false))
+                showDialog = false
+            }
+        )
+    }
+}
+
+
+@Composable
+fun AddPersonDialog(onDismiss: () -> Unit, onAddPerson: (String) -> Unit) {
+    var name by remember { mutableStateOf(TextFieldValue("")) }
+
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties()) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Ebban hinzufügen", style = MaterialTheme.typography.titleMedium)
+
+                BasicTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onKeyEvent { keyEvent ->
+                            if (keyEvent.key == Key.Enter) {
+                                if (name.text.isNotEmpty()) {
+                                    onAddPerson(name.text.removeSuffix("\n"))
+                                    onDismiss()
+                                }
+                                true
+                            } else {
+                                false
+                            }
+                        },
+                    decorationBox = { innerTextField ->
+                        Box(modifier = Modifier.padding(8.dp)) {
+                            if (name.text.isEmpty()) Text("Gib bitte an Namen ei", color = Color.Gray)
+                            innerTextField()
+                        }
+                    }
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Icon(Icons.Filled.Close, contentDescription = "Doch ned")
+                        Text("Doch ned")
+                    }
+                    TextButton(onClick = {
+                        if (name.text.isNotEmpty()) {
+                            onAddPerson(name.text)
+                            onDismiss()
+                        }
+                    }) {
+                        Icon(Icons.Filled.Add, contentDescription = "Bast, dazua doa")
+                        Text("Bast, dazua doa")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun PersonItem(
+    person: Person,
+    onDeletePerson: () -> Unit,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = person.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .clickable {
+                                onDeletePerson()
+                            }
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}

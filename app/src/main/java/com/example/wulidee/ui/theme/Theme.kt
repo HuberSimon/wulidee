@@ -1,4 +1,4 @@
-package com.example.herzis_android.ui.theme
+package com.example.wulidee.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -22,9 +22,9 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Red100,
+    secondary = Red150,
+    tertiary = Red255
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun HerzisandroidTheme(
+fun WulideeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

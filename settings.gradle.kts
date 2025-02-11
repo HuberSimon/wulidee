@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "herzis-android"
+rootProject.name = "wulidee"
 include(":app")

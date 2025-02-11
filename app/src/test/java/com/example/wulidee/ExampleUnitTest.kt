@@ -1,4 +1,4 @@
-package com.example.herzis_android
+package com.example.wulidee
 
 import org.junit.Test
 
