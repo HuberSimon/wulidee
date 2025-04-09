@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -144,6 +146,7 @@ fun AddIdeaDialog(onDismiss: () -> Unit, onAddIdea: (String) -> Unit) {
                                 false
                             }
                         },
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     decorationBox = { innerTextField ->
                         Box(modifier = Modifier.padding(8.dp)) {
                             if (name.text.isEmpty()) Text("Geschenkidee eingeben", color = Color.Gray)
@@ -160,14 +163,13 @@ fun AddIdeaDialog(onDismiss: () -> Unit, onAddIdea: (String) -> Unit) {
                         Icon(Icons.Filled.Close, contentDescription = "Abbrechen")
                         Text("Abbrechen")
                     }
-                    TextButton(onClick = {
+                    Button(onClick = {
                         if (name.text.isNotEmpty()) {
                             onAddIdea(name.text)
                             onDismiss()
                         }
                     }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Hinzufügen")
-                        Text("Hinzufügen")
+                        Text("OK")
                     }
                 }
             }

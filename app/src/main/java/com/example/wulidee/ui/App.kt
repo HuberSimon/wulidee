@@ -22,21 +22,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.wulidee.data.local.Person
+import com.example.wulidee.data.local.User
 
 @Composable
-fun App(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel) {
-    val isInitialized by personViewModel.isInitialized.collectAsState()
+fun App(userViewModel: UserViewModel, personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel, reminderViewModel: ReminderViewModel) {
+    val isInitialized by userViewModel.isInitialized.collectAsState()
+    val isPinCorrect = remember { mutableStateOf(false) }
 
     if (!isInitialized) {
         LoadingScreen()
     } else {
-        val mainPerson = personViewModel.mainPerson.collectAsState(initial = null).value
+        val user = userViewModel.user.collectAsState(initial = null).value
 
-        if (mainPerson == null || mainPerson.name.isEmpty()) {
-            userAdd(personViewModel)
+        if (user == null || user.name.isEmpty()) {
+            userAdd(userViewModel)
         } else {
-            NavGraph(personViewModel, ideaViewModel)
+            if (user.pinLock && user.pinEncrypted != 0 && !isPinCorrect.value) {
+                PinLockScreen(
+                    password = user.pinEncrypted,
+                    onPinSuccess = { isPinCorrect.value = true }
+                )
+            } else {
+                NavGraph(userViewModel, personViewModel, ideaViewModel, reminderViewModel)
+            }
         }
     }
 }
@@ -58,10 +66,10 @@ fun LoadingScreen() {
 
 
 @Composable
-fun userAdd(personViewModel: PersonViewModel) {
+fun userAdd(userViewModel: UserViewModel) {
     var showDialog by remember { mutableStateOf(false) }
-    val mainPerson by personViewModel.mainPerson.collectAsState(initial = null)
-    val mainPersonName = mainPerson?.name
+    val user by userViewModel.user.collectAsState(initial = null)
+    val userName = user?.name
 
     Column(
         modifier = Modifier
@@ -71,7 +79,7 @@ fun userAdd(personViewModel: PersonViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
 
-        if (mainPersonName == "") {
+        if (userName == "") {
             showDialog = true
         }
 
@@ -79,7 +87,7 @@ fun userAdd(personViewModel: PersonViewModel) {
             NameInputDialog(
                 onDismiss = { showDialog = false },
                 onConfirm = { enteredName ->
-                    personViewModel.updatePerson(Person(id = mainPerson!!.id, name = enteredName, mainPerson = true))
+                    userViewModel.updateUser(User(id = user!!.id, name = enteredName, pinEncrypted = 0, pinLock = false, reminderEnabled = false))
                     showDialog = false
                 }
             )

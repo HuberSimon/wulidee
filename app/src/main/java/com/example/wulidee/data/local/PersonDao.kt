@@ -18,12 +18,6 @@ interface PersonDao {
     @Query("SELECT * FROM persons ORDER BY id DESC")
     fun getAllPersons(): Flow<List<Person>>
 
-    @Query("SELECT * FROM persons WHERE mainPerson = 1 LIMIT 1")
-    fun getMainPerson(): Flow<Person?>
-
-    @Query("SELECT name FROM persons WHERE mainPerson = 1 LIMIT 1")
-    fun getMainPersonName(): Flow<String?>
-
     @Query("SELECT COUNT(*) FROM persons")
     fun getPersonCount(): Flow<Int>
 

@@ -15,9 +15,6 @@ class PersonViewModel(
     private val repository: PersonRepository,
 ) : ViewModel() {
 
-    private val _isInitialized = MutableStateFlow(false)
-    val isInitialized: StateFlow<Boolean> = _isInitialized
-
     private val _selectedPerson = MutableStateFlow<Person?>(null)
     val selectedPerson: StateFlow<Person?> = _selectedPerson
 
@@ -28,25 +25,11 @@ class PersonViewModel(
             emptyList()
         )
 
-    val mainPerson: StateFlow<Person?> = repository.getMainPerson().stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        null
-    )
-
     val personCount = repository.personCount.stateIn(
         viewModelScope,
         SharingStarted.Lazily,
         0
     )
-
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.initializeMainPerson()
-            _isInitialized.value = true
-        }
-    }
 
     fun addPerson(person: Person) {
         viewModelScope.launch {

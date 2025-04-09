@@ -21,17 +21,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.wulidee.data.local.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun CustomTopAppBarWithTabs(
-    personName: String,
+    user: User,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     navController: NavController
 ) {
-    val titles = listOf("Personen", "Einkaufen", "Benutzer")
+    var titles = listOf("Lieblingsmenschen","Benutzer")
+    if (user?.reminderEnabled == true){
+        titles = listOf("Lieblingsmenschen", "Erinnerung", "Benutzer")
+    }
     Column {
         Row(
             modifier = Modifier
@@ -73,7 +77,7 @@ fun CustomTopAppBarWithTabs(
                     }
                 }
             ) {
-                CircleWithLetter(letter = personName.firstOrNull()?.uppercaseChar()?.toString() ?: "?")
+                CircleWithLetter(letter = user.name.firstOrNull()?.uppercaseChar()?.toString() ?: "?")
             }
         }
 

@@ -2,11 +2,12 @@ package com.example.wulidee.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date
 
-@Entity(tableName = "persons")
-data class Person(
+@Entity(tableName = "reminders")
+data class Reminder(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val name: String,
-    val pin: String,
-    val pinLock: Boolean
+    val userId: Int,
+    val importantDate: Date,
+    val description: String
 )

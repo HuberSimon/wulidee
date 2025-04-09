@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -32,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -57,25 +60,26 @@ import com.example.wulidee.ui.IdeaViewModel
 import com.example.wulidee.ui.PersonViewModel
 
 @Composable
-fun PersonScreen(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel, navController: NavController) {
+fun PersonScreen(personViewModel: PersonViewModel, navController: NavController) {
     val allPersons by personViewModel.allPersons.collectAsState(initial = emptyList())
     var showDialog by remember { mutableStateOf(false) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var selectedPerson by remember { mutableStateOf<Person?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
         ) {
-            item {
-                Text(text = "Leid de i beschenken mog", style = MaterialTheme.typography.titleLarge)
+            if (allPersons.isEmpty()) {
+                item {
+                    Text(
+                        text = "Erstelle Personen, die beschenkt werden sollen",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
 
-            item { Spacer(modifier = Modifier.height(25.dp)) }
-
-            items(allPersons.filter { !it.mainPerson }) { person ->
+            items(allPersons) { person ->
                 PersonItem(
                     person,
                     onDeletePerson = {
@@ -96,7 +100,7 @@ fun PersonScreen(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel,
                 .padding(16.dp),
             containerColor = MaterialTheme.colorScheme.secondary
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Ebban hinzufügen", tint = Color.White)
+            Icon(Icons.Filled.Add, contentDescription = "Person hinzufügen", tint = Color.White)
         }
     }
 
@@ -104,7 +108,7 @@ fun PersonScreen(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel,
         AddPersonDialog(
             onDismiss = { showDialog = false },
             onAddPerson = { name ->
-                personViewModel.addPerson(Person(name = name, mainPerson = false))
+                personViewModel.addPerson(Person(name = name, pin = "", pinLock = false))
                 showDialog = false
             }
         )
@@ -125,7 +129,7 @@ fun AddPersonDialog(onDismiss: () -> Unit, onAddPerson: (String) -> Unit) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Ebban hinzufügen", style = MaterialTheme.typography.titleMedium)
+                Text(text = "Person hinzufügen", style = MaterialTheme.typography.titleMedium)
 
                 BasicTextField(
                     value = name,
@@ -143,9 +147,10 @@ fun AddPersonDialog(onDismiss: () -> Unit, onAddPerson: (String) -> Unit) {
                                 false
                             }
                         },
+                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     decorationBox = { innerTextField ->
                         Box(modifier = Modifier.padding(8.dp)) {
-                            if (name.text.isEmpty()) Text("Gib bitte an Namen ei", color = Color.Gray)
+                            if (name.text.isEmpty()) Text("Bitte Namen eingeben", color = Color.Gray)
                             innerTextField()
                         }
                     }
@@ -156,17 +161,15 @@ fun AddPersonDialog(onDismiss: () -> Unit, onAddPerson: (String) -> Unit) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Icon(Icons.Filled.Close, contentDescription = "Doch ned")
-                        Text("Doch ned")
+                        Text("Abbrechen")
                     }
-                    TextButton(onClick = {
+                    Button(onClick = {
                         if (name.text.isNotEmpty()) {
                             onAddPerson(name.text)
                             onDismiss()
                         }
                     }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Bast, dazua doa")
-                        Text("Bast, dazua doa")
+                        Text("OK")
                     }
                 }
             }

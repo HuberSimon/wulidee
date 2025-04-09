@@ -1,7 +1,9 @@
 package com.example.wulidee.ui
 
 import CustomTopAppBarWithTabs
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -18,25 +20,30 @@ import androidx.navigation.compose.rememberNavController
 import com.example.wulidee.ui.screens.IdeaScreen
 import com.example.wulidee.ui.screens.UserScreen
 import com.example.wulidee.ui.screens.PersonScreen
-import com.example.wulidee.ui.screens.ShopScreen
+import com.example.wulidee.ui.screens.ReminderScreen
 
 @Composable
-fun NavGraph(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel) {
+fun NavGraph(userViewModel: UserViewModel, personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel, reminderViewModel: ReminderViewModel) {
     val navController = rememberNavController()
-    val mainPerson by personViewModel.mainPerson.collectAsState(initial = null)
-    val mainPersonName = mainPerson?.name ?: ""
+    val user by userViewModel.user.collectAsState(initial = null)
+    val userName = user?.name ?: ""
 
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    var pagerState = rememberPagerState(pageCount = { 2 })
+    if (user?.reminderEnabled == true){
+        pagerState = rememberPagerState(pageCount = { 3 })
+    }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
-            CustomTopAppBarWithTabs(
-                personName = mainPersonName,
-                pagerState = pagerState,
-                coroutineScope = coroutineScope,
-                navController = navController
-            )
+            user?.let {
+                CustomTopAppBarWithTabs(
+                    user = it,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope,
+                    navController = navController
+                )
+            }
         },
         content = { innerPadding ->
             NavHost(
@@ -53,10 +60,17 @@ fun NavGraph(personViewModel: PersonViewModel, ideaViewModel: IdeaViewModel) {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) { page ->
-                        when (page) {
-                            0 -> PersonScreen(personViewModel, ideaViewModel, navController)
-                            1 -> ShopScreen(personViewModel, ideaViewModel)
-                            2 -> UserScreen(personViewModel)
+                        if (user?.reminderEnabled == true) {
+                            when (page) {
+                                0 -> PersonScreen(personViewModel, navController)
+                                1 -> ReminderScreen(personViewModel, reminderViewModel)
+                                2 -> UserScreen(userViewModel)
+                            }
+                        }else {
+                            when (page) {
+                                0 -> PersonScreen(personViewModel, navController)
+                                1 -> UserScreen(userViewModel)
+                            }
                         }
                     }
                 }
