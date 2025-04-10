@@ -126,7 +126,8 @@ fun PinLockScreen(
                             ) {
                                 Text(
                                     text = number.toString(),
-                                    style = typography.h5
+                                    style = typography.h5,
+                                    color = Color.White
                                 )
                             }
                         }
@@ -151,7 +152,8 @@ fun PinLockScreen(
                         Text(
                             text = "0",
                             style = typography.h5,
-                            modifier = Modifier.padding(4.dp)
+                            modifier = Modifier.padding(4.dp),
+                            color = Color.White
                         )
                     }
                     Icon(

@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -114,7 +115,7 @@ fun UserScreen(userViewModel: UserViewModel) {
                     },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        checkedTrackColor = Color.DarkGray,
                     )
                 )
 
@@ -160,7 +161,11 @@ fun UserScreen(userViewModel: UserViewModel) {
                                 reminderEnabled = reminderEnabledIsChecked
                             )
                         )
-                    }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = Color.DarkGray,
+                    )
                 )
             }
         }
@@ -217,7 +222,8 @@ fun PinInputDialog(
                 onClick = { onConfirm(pin) },
                 enabled = pin.length == 4
             ) {
-                Text("OK")
+                val textColor = if (pin.length == 4) Color.White else Color.DarkGray
+                Text(text = "OK", color = textColor)
             }
         },
         dismissButton = {
